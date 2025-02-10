@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Identity;
 
 namespace BoardGameSchedulerBackend.Infrastructure
 {
+    public class IdentityUserRepositoryUserCreationFailed : Exception { }
+
     public class IdentityUserRepository : IUserRepository
     {
         private readonly UserManager<IdentityUser> _userManager;
@@ -24,7 +26,7 @@ namespace BoardGameSchedulerBackend.Infrastructure
             var result = await _userManager.CreateAsync(identityUser, password);
             if (!result.Succeeded)
             {
-                throw new Exception("Failed to create user: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+                throw new IdentityUserRepositoryUserCreationFailed();
             }
 
             user.Id = Guid.Parse(identityUser.Id);
