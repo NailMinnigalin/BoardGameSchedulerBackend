@@ -37,8 +37,39 @@ namespace BGSBTesting
                 .Setup(um => um.CreateAsync(It.IsAny<IdentityUser>(), It.IsAny<string>()))
                 .ReturnsAsync(IdentityResult.Failed());
 
-            await Assert.ThrowsExceptionAsync<IdentityUserRepositoryUserCreationFailed>(
+            await Assert.ThrowsExceptionAsync<IdentityUserRepositoryUserCreationFailedException>(
                 async () => 
+                await _repository.CreateAsync(new User { Email = "validEmail@example.com", UserName = "ValidUserName" }, "ValidPassword")
+            );
+        }
+
+        [TestMethod]
+        public async Task CreateAsync_FailUserCreationIvalidPassword()
+        {
+            IdentityErrorDescriber _identityErrorDescriber = new IdentityErrorDescriber();
+            List<IdentityError> passwordErrors = new List<IdentityError>
+            {
+                _identityErrorDescriber.PasswordRequiresNonAlphanumeric(),
+                _identityErrorDescriber.PasswordRequiresLower(),
+                _identityErrorDescriber.PasswordRequiresDigit(),
+                _identityErrorDescriber.PasswordRequiresUpper(),
+                _identityErrorDescriber.PasswordRequiresUniqueChars(10)
+            };
+
+            foreach(var passwordError in passwordErrors)
+            {
+                await TestForInvalidPassword(passwordError);
+            }
+        }
+
+        private async Task TestForInvalidPassword(IdentityError identityError)
+        {
+            _userManagerMock
+                .Setup(um => um.CreateAsync(It.IsAny<IdentityUser>(), It.IsAny<string>()))
+                .ReturnsAsync(IdentityResult.Failed(identityError));
+
+            await Assert.ThrowsExceptionAsync<IdentityUserRepositoryInvalidPasswordException>(
+                async () =>
                 await _repository.CreateAsync(new User { Email = "validEmail@example.com", UserName = "ValidUserName" }, "ValidPassword")
             );
         }
