@@ -5,6 +5,6 @@ namespace BoardGameSchedulerBackend.BusinessLayer.ApplicationLayer
 	public interface IUserRepository
 	{
 		Task<User?> GetByIdAsync(Guid id);
-		Task CreateAsync(User user, string password);
+		Task CreateAsync(string userName, string userEmail, string password);
 	}
 }

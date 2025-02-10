@@ -27,7 +27,7 @@ namespace BGSBTesting
 				.Setup(um => um.CreateAsync(It.IsAny<IdentityUser>(), It.IsAny<string>()))
 				.ReturnsAsync(IdentityResult.Success);
 
-		   await _repository.CreateAsync(new User { Email = "validEmail@example.com", UserName = "ValidUserName" }, "ValidPassword");
+		   await _repository.CreateAsync("ValidUserName", "validEmail@example.com", "ValidPassword");
 		}
 
 		[TestMethod]
@@ -39,7 +39,7 @@ namespace BGSBTesting
 
 			await Assert.ThrowsExceptionAsync<IdentityUserRepositoryUserCreationFailedException>(
 				async () => 
-				await _repository.CreateAsync(new User { Email = "validEmail@example.com", UserName = "ValidUserName" }, "ValidPassword")
+				await _repository.CreateAsync("ValidUserName", "validEmail@example.com", "ValidPassword")
 			);
 		}
 
@@ -100,7 +100,7 @@ namespace BGSBTesting
 
 			await Assert.ThrowsExceptionAsync<IdentityUserRepositoryInvalidPasswordException>(
 				async () =>
-				await _repository.CreateAsync(new User { Email = "validEmail@example.com", UserName = "ValidUserName" }, "ValidPassword")
+				await _repository.CreateAsync("ValidUserName", "validEmail@example.com", "ValidPassword")
 			);
 		}
 

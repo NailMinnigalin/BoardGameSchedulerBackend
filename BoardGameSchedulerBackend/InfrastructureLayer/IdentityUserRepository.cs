@@ -17,12 +17,12 @@ namespace BoardGameSchedulerBackend.Infrastructure
 			_userManager = userManager;
 		}
 
-		public async Task CreateAsync(User user, string password)
+		public async Task CreateAsync(string userName, string userEmail, string password)
 		{
 			var identityUser = new IdentityUser
 			{
-				UserName = user.UserName,
-				Email = user.Email,
+				UserName = userName,
+				Email = userEmail,
 			};
 
 			var result = await _userManager.CreateAsync(identityUser, password);
@@ -30,8 +30,6 @@ namespace BoardGameSchedulerBackend.Infrastructure
 			{
 				ThrowException(result);
 			}
-
-			user.Id = Guid.Parse(identityUser.Id);
 		}
 
 		public async Task<User?> GetByIdAsync(Guid id)
@@ -43,8 +41,8 @@ namespace BoardGameSchedulerBackend.Infrastructure
 			return new User
 			{
 				Id = id,
-				UserName = identityUser.UserName,
-				Email = identityUser.Email
+				UserName = identityUser.UserName!,
+				Email = identityUser.Email!
 			};
 		}
 
