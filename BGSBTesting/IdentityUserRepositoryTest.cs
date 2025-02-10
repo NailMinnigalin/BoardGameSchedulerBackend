@@ -62,6 +62,23 @@ namespace BGSBTesting
             }
         }
 
+        [TestMethod]
+        public async Task GetByIdAsync_SuccessfulGetExistringUser()
+        {
+            User existedUserId = new() { Email = "validEmail@example.com", UserName = "ValidUserName", Id = new Guid() };
+            _userManagerMock
+                .Setup(um => um.FindByIdAsync(existedUserId.Id.ToString()))
+                .ReturnsAsync(new IdentityUser { Email = existedUserId.Email, UserName = existedUserId.UserName });
+
+            var foundUser =  await _repository.GetByIdAsync(existedUserId.Id);
+            
+            Assert.IsTrue(
+                existedUserId.Id == foundUser!.Id && 
+                existedUserId.Email == foundUser.Email && 
+                existedUserId.UserName == foundUser.UserName
+            );
+        }
+
         private async Task TestForInvalidPassword(IdentityError identityError)
         {
             _userManagerMock
