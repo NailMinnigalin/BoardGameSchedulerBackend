@@ -25,5 +25,17 @@ namespace BGSBTesting
 
 			await _userService.RegisterUserAsync("validUserName", "validUserEmail@example.com", "ValidPassword");
 		}
+
+		[TestMethod]
+		public async Task RegisterUserAsyncReturnsRegistrationError()
+		{
+			_iUserRepositoryMock
+				.Setup(iur => iur.CreateAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+				.ReturnsAsync(new UserCreationResult() { Errors = [UserCreationResult.ErrorCode.InvalidEmail] });
+
+			var result = await _userService.RegisterUserAsync("validUserName", "validUserEmail@example.com", "ValidPassword");
+
+			Assert.IsTrue(result.Errors.First() == UserCreationResult.ErrorCode.InvalidEmail);
+		}
 	}
 }

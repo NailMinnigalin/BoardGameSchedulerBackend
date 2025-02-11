@@ -10,9 +10,9 @@ namespace BoardGameSchedulerBackend.BusinessLayer
 			_userRepository = userRepository;
 		}
 
-		public async Task RegisterUserAsync(string userName, string email, string password)
+		public async Task<UserCreationResult> RegisterUserAsync(string userName, string email, string password)
 		{
-			await _userRepository.CreateAsync(userName, email, password);
+			return await _userRepository.CreateAsync(userName, email, password);
 		}
 
 		public async Task<User?> GetUserAsync(Guid id)
