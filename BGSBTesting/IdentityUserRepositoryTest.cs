@@ -21,7 +21,7 @@ namespace BGSBTesting
 		}
 
 		[TestMethod]
-		public async Task CreateAsync_SuccessfulUserCreation()
+		public async Task CreateAsyncSuccessfulUserCreation()
 		{
 			_userManagerMock
 				.Setup(um => um.CreateAsync(It.IsAny<IdentityUser>(), It.IsAny<string>()))
@@ -31,7 +31,7 @@ namespace BGSBTesting
 		}
 
 		[TestMethod]
-		public async Task CreateAsync_FailUserCreation()
+		public async Task CreateAsyncFailUserCreation()
 		{
 			_userManagerMock
 				.Setup(um => um.CreateAsync(It.IsAny<IdentityUser>(), It.IsAny<string>()))
@@ -44,7 +44,7 @@ namespace BGSBTesting
 		}
 
 		[TestMethod]
-		public async Task CreateAsync_FailUserCreationIvalidPassword()
+		public async Task CreateAsyncFailUserCreationIvalidPassword()
 		{
 			IdentityErrorDescriber _identityErrorDescriber = new IdentityErrorDescriber();
 			List<IdentityError> passwordErrors = new List<IdentityError>
@@ -63,7 +63,7 @@ namespace BGSBTesting
 		}
 
 		[TestMethod]
-		public async Task GetByIdAsync_SuccessfulGetExistingUser()
+		public async Task GetByIdAsyncSuccessfulGetExistingUser()
 		{
 			User existedUserId = new() { Email = "validEmail@example.com", UserName = "ValidUserName", Id = new Guid() };
 			_userManagerMock
@@ -80,7 +80,7 @@ namespace BGSBTesting
 		}
 
 		[TestMethod]
-		public async Task GetByIdAsync_GetNullWhenUserNotFound()
+		public async Task GetByIdAsyncGetNullWhenUserNotFound()
 		{
 			IdentityUser? nullIdentity = null;
 			_userManagerMock
@@ -104,7 +104,7 @@ namespace BGSBTesting
 			);
 		}
 
-		private Mock<UserManager<IdentityUser>> CreateUserManagerMock()
+		private static Mock<UserManager<IdentityUser>> CreateUserManagerMock()
 		{
 			var storeMock = new Mock<IUserStore<IdentityUser>>();
 			var optionsMock = new Mock<IOptions<IdentityOptions>>();
