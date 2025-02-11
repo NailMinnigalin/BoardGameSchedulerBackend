@@ -6,7 +6,16 @@ namespace BoardGameSchedulerBackend.BusinessLayer
 	{
 		public enum ErrorCode
 		{
-			DuplicateEmail
+			DuplicateEmail,
+			InvalidEmail,
+			PasswordRequiresUniqueChars,
+			DuplicateUserName,
+			InvalidUserName,
+			PasswordRequiresDigit,
+			PasswordRequiresLower,
+			PasswordRequiresNonAlphanumeric,
+			PasswordRequiresUpper,
+			PasswordTooShort
 		}
 
 		public List<ErrorCode> Errors { get; init; }

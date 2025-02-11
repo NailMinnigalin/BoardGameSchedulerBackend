@@ -62,17 +62,40 @@ namespace BGSBTesting
 		}
 
 		[TestMethod]
-		public async Task CreateAsyncWithDublicatedEmailReturnsUserCreationResultWithSignleDuplicateEmailError()
+		public async Task CreateAsyncReturnsUserCreationResultWithAppropriateErrorWhenUserCreationErrorHappened()
 		{
 			IdentityErrorDescriber _identityErrorDescriber = new IdentityErrorDescriber();
+			const string email = "email";
+			const string userName = "userName";
+			List<(IdentityError identityError, UserCreationResult.ErrorCode exprectedErrorCode)> IdentityErrorAndExpectedErrorCodePairs = [
+				(_identityErrorDescriber.DuplicateEmail(email), UserCreationResult.ErrorCode.DuplicateEmail),
+				(_identityErrorDescriber.InvalidEmail(email), UserCreationResult.ErrorCode.InvalidEmail),
+				(_identityErrorDescriber.PasswordRequiresUniqueChars(1), UserCreationResult.ErrorCode.PasswordRequiresUniqueChars),
+				(_identityErrorDescriber.DuplicateUserName(userName), UserCreationResult.ErrorCode.DuplicateUserName),
+				(_identityErrorDescriber.InvalidUserName(userName), UserCreationResult.ErrorCode.InvalidUserName),
+				(_identityErrorDescriber.PasswordRequiresDigit(), UserCreationResult.ErrorCode.PasswordRequiresDigit),
+				(_identityErrorDescriber.PasswordRequiresLower(), UserCreationResult.ErrorCode.PasswordRequiresLower),
+				(_identityErrorDescriber.PasswordRequiresNonAlphanumeric(), UserCreationResult.ErrorCode.PasswordRequiresNonAlphanumeric),
+				(_identityErrorDescriber.PasswordRequiresUpper(), UserCreationResult.ErrorCode.PasswordRequiresUpper),
+				(_identityErrorDescriber.PasswordTooShort(1), UserCreationResult.ErrorCode.PasswordTooShort),
+			];
+
+			foreach(var pair in IdentityErrorAndExpectedErrorCodePairs)
+			{
+				await TestThatIdentityErrorLeadsToCorrespondErrorCode(pair.identityError, pair.exprectedErrorCode);
+			}
+		}
+
+		private async Task TestThatIdentityErrorLeadsToCorrespondErrorCode(IdentityError identityError, UserCreationResult.ErrorCode expectedErrorCode)
+		{
 			_userManagerMock
 				.Setup(um => um.CreateAsync(It.IsAny<IdentityUser>(), It.IsAny<string>()))
-				.ReturnsAsync(IdentityResult.Failed(_identityErrorDescriber.DuplicateEmail("anyEmail")));
+				.ReturnsAsync(IdentityResult.Failed(identityError));
 
 			UserCreationResult userCreationResult = await _repository.CreateAsync("ValidUserName", "validEmail@example.com", "ValidPassword");
-			
-			Assert.IsTrue(userCreationResult.Errors.Count == 1);
-			Assert.IsTrue(userCreationResult.Errors.First() == UserCreationResult.ErrorCode.DuplicateEmail);
+
+			Assert.IsTrue(userCreationResult.Errors.Count == 1, "Not only 1 error");
+			Assert.IsTrue(userCreationResult.Errors.First() == expectedErrorCode, $"Expected: {expectedErrorCode} was: {userCreationResult.Errors.First()}");
 		}
 
 		private static Mock<UserManager<IdentityUser>> CreateUserManagerMock()

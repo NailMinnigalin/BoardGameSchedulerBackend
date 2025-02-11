@@ -54,8 +54,29 @@ namespace BoardGameSchedulerBackend.Infrastructure
 
 		private UserCreationResult.ErrorCode ToUserCreationErrorCode(IdentityError error)
 		{
-			if (_identityErrorDescriber.DuplicateEmail("anyEmail").Code == error.Code)
+			const string email = "email";
+			const string userName = "userName";
+
+			if (_identityErrorDescriber.DuplicateEmail(email).Code == error.Code)
 				return UserCreationResult.ErrorCode.DuplicateEmail;
+			else if (_identityErrorDescriber.InvalidEmail(email).Code == error.Code)
+				return UserCreationResult.ErrorCode.InvalidEmail;
+			else if (_identityErrorDescriber.PasswordRequiresUniqueChars(1).Code == error.Code)
+				return UserCreationResult.ErrorCode.PasswordRequiresUniqueChars;
+			else if (_identityErrorDescriber.DuplicateUserName(userName).Code == error.Code)
+				return UserCreationResult.ErrorCode.DuplicateUserName;
+			else if (_identityErrorDescriber.InvalidUserName(userName).Code == error.Code)
+				return UserCreationResult.ErrorCode.InvalidUserName;
+			else if (_identityErrorDescriber.PasswordRequiresDigit().Code == error.Code)
+				return UserCreationResult.ErrorCode.PasswordRequiresDigit;
+			else if (_identityErrorDescriber.PasswordRequiresLower().Code == error.Code)
+				return UserCreationResult.ErrorCode.PasswordRequiresLower;
+			else if (_identityErrorDescriber.PasswordRequiresNonAlphanumeric().Code == error.Code)
+				return UserCreationResult.ErrorCode.PasswordRequiresNonAlphanumeric;
+			else if (_identityErrorDescriber.PasswordRequiresUpper().Code == error.Code)
+				return UserCreationResult.ErrorCode.PasswordRequiresUpper;
+			else if (_identityErrorDescriber.PasswordTooShort(1).Code == error.Code)
+				return UserCreationResult.ErrorCode.PasswordTooShort;
 
 			throw new ArgumentOutOfRangeException($"Can't find matched UserCreationErrorCode for IdentityError with code = {error.Code}");
 		}
