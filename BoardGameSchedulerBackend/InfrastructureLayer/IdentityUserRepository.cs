@@ -6,6 +6,7 @@ namespace BoardGameSchedulerBackend.Infrastructure
 {
 	public class IdentityUserRepositoryUserCreationFailedException : Exception { }
 	public class IdentityUserRepositoryInvalidPasswordException : Exception { }
+	public class IdentityUserRepositoryDuplicateEmaildException : Exception { }
 
 	public class IdentityUserRepository : IUserRepository
 	{
@@ -51,6 +52,10 @@ namespace BoardGameSchedulerBackend.Infrastructure
 			if (result.Errors.Any(e => IsInvalidPasswordIdentityError(e)))
 			{
 				throw new IdentityUserRepositoryInvalidPasswordException();
+			}
+			if (result.Errors.Any(e => e.Code == _identityErrorDescriber.DuplicateEmail("anyEmail").Code))
+			{
+				throw new IdentityUserRepositoryDuplicateEmaildException();
 			}
 
 			throw new IdentityUserRepositoryUserCreationFailedException();

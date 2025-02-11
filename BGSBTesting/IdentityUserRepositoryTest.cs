@@ -92,6 +92,20 @@ namespace BGSBTesting
 			Assert.IsNull(user);
 		}
 
+		[TestMethod]
+		public async Task CreateAsyncThrowsEmailDuplicateExceptionWhenEmailDuplicated()
+		{
+			IdentityErrorDescriber _identityErrorDescriber = new IdentityErrorDescriber();
+			_userManagerMock
+				.Setup(um => um.CreateAsync(It.IsAny<IdentityUser>(), It.IsAny<string>()))
+				.ReturnsAsync(IdentityResult.Failed(_identityErrorDescriber.DuplicateEmail("testEmail")));
+
+			await Assert.ThrowsExceptionAsync<IdentityUserRepositoryDuplicateEmaildException>(
+				async () =>
+				await _repository.CreateAsync("validUserName", "dublicatedValidEmail@example.com", "ValidPassword")
+			);
+		}
+
 		private async Task TestForInvalidPassword(IdentityError identityError)
 		{
 			_userManagerMock
