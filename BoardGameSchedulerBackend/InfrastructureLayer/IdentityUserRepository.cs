@@ -4,10 +4,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace BoardGameSchedulerBackend.Infrastructure
 {
-	public class IdentityUserRepositoryUserCreationFailedException : Exception { }
-	public class IdentityUserRepositoryInvalidPasswordException : Exception { }
-	public class IdentityUserRepositoryDuplicateEmaildException : Exception { }
-
+	/// <summary>
+	/// Low-level user manager. Decouple business layer from Identity framework
+	/// </summary>
 	public class IdentityUserRepository : IUserRepository
 	{
 		private readonly UserManager<IdentityUser> _userManager;
@@ -18,7 +17,7 @@ namespace BoardGameSchedulerBackend.Infrastructure
 			_userManager = userManager;
 		}
 
-		public async Task CreateAsync(string userName, string userEmail, string password)
+		public async Task<UserCreationResult> CreateAsync(string userName, string userEmail, string password)
 		{
 			var identityUser = new IdentityUser
 			{
@@ -27,10 +26,7 @@ namespace BoardGameSchedulerBackend.Infrastructure
 			};
 
 			var result = await _userManager.CreateAsync(identityUser, password);
-			if (!result.Succeeded)
-			{
-				ThrowException(result);
-			}
+			return BuildUserCreationResult(result);
 		}
 
 		public async Task<User?> GetByIdAsync(Guid id)
@@ -47,32 +43,21 @@ namespace BoardGameSchedulerBackend.Infrastructure
 			};
 		}
 
-		private void ThrowException(IdentityResult result)
+		private UserCreationResult BuildUserCreationResult(IdentityResult identityResult)
 		{
-			if (result.Errors.Any(e => IsInvalidPasswordIdentityError(e)))
-			{
-				throw new IdentityUserRepositoryInvalidPasswordException();
-			}
-			if (result.Errors.Any(e => e.Code == _identityErrorDescriber.DuplicateEmail("anyEmail").Code))
-			{
-				throw new IdentityUserRepositoryDuplicateEmaildException();
-			}
+			if (identityResult.Succeeded)
+				return new UserCreationResult();
 
-			throw new IdentityUserRepositoryUserCreationFailedException();
+			List<UserCreationResult.ErrorCode> errors = identityResult.Errors.Select(e => ToUserCreationErrorCode(e)).ToList();
+			return new UserCreationResult(errors);
 		}
 
-		private bool IsInvalidPasswordIdentityError(IdentityError error)
+		private UserCreationResult.ErrorCode ToUserCreationErrorCode(IdentityError error)
 		{
-			List<IdentityError> invalidPassowrdErrors =
-			[
-				_identityErrorDescriber.PasswordRequiresNonAlphanumeric(),
-				_identityErrorDescriber.PasswordRequiresLower(),
-				_identityErrorDescriber.PasswordRequiresDigit(),
-				_identityErrorDescriber.PasswordRequiresUpper(),
-				_identityErrorDescriber.PasswordRequiresUniqueChars(10)
-			];
+			if (_identityErrorDescriber.DuplicateEmail("anyEmail").Code == error.Code)
+				return UserCreationResult.ErrorCode.DuplicateEmail;
 
-			return invalidPassowrdErrors.Any(e => e.Code == error.Code);
+			throw new ArgumentOutOfRangeException($"Can't find matched UserCreationErrorCode for IdentityError with code = {error.Code}");
 		}
 	}
 }

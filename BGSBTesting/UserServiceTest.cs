@@ -21,7 +21,7 @@ namespace BGSBTesting
 		{
 			_iUserRepositoryMock
 				.Setup(iur => iur.CreateAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-				.Returns(Task.CompletedTask);
+				.ReturnsAsync(new UserCreationResult());
 
 			await _userService.RegisterUserAsync("validUserName", "validUserEmail@example.com", "ValidPassword");
 		}

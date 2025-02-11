@@ -1,4 +1,5 @@
-﻿using BoardGameSchedulerBackend.DataLayer;
+﻿using BoardGameSchedulerBackend.BusinessLayer;
+using BoardGameSchedulerBackend.DataLayer;
 using BoardGameSchedulerBackend.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -28,38 +29,6 @@ namespace BGSBTesting
 				.ReturnsAsync(IdentityResult.Success);
 
 		   await _repository.CreateAsync("ValidUserName", "validEmail@example.com", "ValidPassword");
-		}
-
-		[TestMethod]
-		public async Task CreateAsyncFailUserCreation()
-		{
-			_userManagerMock
-				.Setup(um => um.CreateAsync(It.IsAny<IdentityUser>(), It.IsAny<string>()))
-				.ReturnsAsync(IdentityResult.Failed());
-
-			await Assert.ThrowsExceptionAsync<IdentityUserRepositoryUserCreationFailedException>(
-				async () => 
-				await _repository.CreateAsync("ValidUserName", "validEmail@example.com", "ValidPassword")
-			);
-		}
-
-		[TestMethod]
-		public async Task CreateAsyncFailUserCreationIvalidPassword()
-		{
-			IdentityErrorDescriber _identityErrorDescriber = new IdentityErrorDescriber();
-			List<IdentityError> passwordErrors = new List<IdentityError>
-			{
-				_identityErrorDescriber.PasswordRequiresNonAlphanumeric(),
-				_identityErrorDescriber.PasswordRequiresLower(),
-				_identityErrorDescriber.PasswordRequiresDigit(),
-				_identityErrorDescriber.PasswordRequiresUpper(),
-				_identityErrorDescriber.PasswordRequiresUniqueChars(10)
-			};
-
-			foreach(var passwordError in passwordErrors)
-			{
-				await TestForInvalidPassword(passwordError);
-			}
 		}
 
 		[TestMethod]
@@ -93,29 +62,17 @@ namespace BGSBTesting
 		}
 
 		[TestMethod]
-		public async Task CreateAsyncThrowsEmailDuplicateExceptionWhenEmailDuplicated()
+		public async Task CreateAsyncWithDublicatedEmailReturnsUserCreationResultWithSignleDuplicateEmailError()
 		{
 			IdentityErrorDescriber _identityErrorDescriber = new IdentityErrorDescriber();
 			_userManagerMock
 				.Setup(um => um.CreateAsync(It.IsAny<IdentityUser>(), It.IsAny<string>()))
-				.ReturnsAsync(IdentityResult.Failed(_identityErrorDescriber.DuplicateEmail("testEmail")));
+				.ReturnsAsync(IdentityResult.Failed(_identityErrorDescriber.DuplicateEmail("anyEmail")));
 
-			await Assert.ThrowsExceptionAsync<IdentityUserRepositoryDuplicateEmaildException>(
-				async () =>
-				await _repository.CreateAsync("validUserName", "dublicatedValidEmail@example.com", "ValidPassword")
-			);
-		}
-
-		private async Task TestForInvalidPassword(IdentityError identityError)
-		{
-			_userManagerMock
-				.Setup(um => um.CreateAsync(It.IsAny<IdentityUser>(), It.IsAny<string>()))
-				.ReturnsAsync(IdentityResult.Failed(identityError));
-
-			await Assert.ThrowsExceptionAsync<IdentityUserRepositoryInvalidPasswordException>(
-				async () =>
-				await _repository.CreateAsync("ValidUserName", "validEmail@example.com", "ValidPassword")
-			);
+			UserCreationResult userCreationResult = await _repository.CreateAsync("ValidUserName", "validEmail@example.com", "ValidPassword");
+			
+			Assert.IsTrue(userCreationResult.Errors.Count == 1);
+			Assert.IsTrue(userCreationResult.Errors.First() == UserCreationResult.ErrorCode.DuplicateEmail);
 		}
 
 		private static Mock<UserManager<IdentityUser>> CreateUserManagerMock()
