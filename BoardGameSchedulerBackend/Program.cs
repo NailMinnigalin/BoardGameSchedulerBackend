@@ -1,4 +1,4 @@
-using BoardGameSchedulerBackend.BusinessLayer.ApplicationLayer;
+using BoardGameSchedulerBackend.BusinessLayer;
 using BoardGameSchedulerBackend.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

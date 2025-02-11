@@ -1,6 +1,6 @@
 ﻿using BoardGameSchedulerBackend.DataLayer;
 
-namespace BoardGameSchedulerBackend.BusinessLayer.ApplicationLayer
+namespace BoardGameSchedulerBackend.BusinessLayer
 {
 	public class UserService : IUserService
 	{
@@ -12,7 +12,7 @@ namespace BoardGameSchedulerBackend.BusinessLayer.ApplicationLayer
 
 		public async Task RegisterUserAsync(string userName, string email, string password)
 		{
-			await _userRepository.CreateAsync(userName, email,  password);
+			await _userRepository.CreateAsync(userName, email, password);
 		}
 
 		public async Task<User?> GetUserAsync(Guid id)

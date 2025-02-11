@@ -1,6 +1,6 @@
 ﻿using BoardGameSchedulerBackend.DataLayer;
 
-namespace BoardGameSchedulerBackend.BusinessLayer.ApplicationLayer
+namespace BoardGameSchedulerBackend.BusinessLayer
 {
 	public interface IUserRepository
 	{
