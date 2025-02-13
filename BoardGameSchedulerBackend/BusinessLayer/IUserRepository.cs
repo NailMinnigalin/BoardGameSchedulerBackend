@@ -32,6 +32,11 @@ namespace BoardGameSchedulerBackend.BusinessLayer
 		}
 	}
 
+	public class SignInResult
+	{
+
+	}
+
 	public interface IUserRepository
 	{
 		Task<User?> GetByIdAsync(Guid id);

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using SignInResult = BoardGameSchedulerBackend.BusinessLayer.SignInResult;
 
 namespace BGSBTesting
 {
@@ -92,7 +93,13 @@ namespace BGSBTesting
 			_identityUserRepository.SignIn("userName", "password");
 		}
 
+		[TestMethod]
+		public void SignInReturnsSignInResult()
+		{
+			var signInResult = _identityUserRepository.SignIn("userName", "password");
 
+			Assert.IsInstanceOfType<SignInResult>(signInResult);
+		}
 
 		private async Task TestThatIdentityErrorLeadsToCorrespondErrorCode(IdentityError identityError, UserCreationResult.ErrorCode expectedErrorCode)
 		{

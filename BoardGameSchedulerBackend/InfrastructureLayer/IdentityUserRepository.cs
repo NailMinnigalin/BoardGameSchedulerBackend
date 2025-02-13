@@ -1,6 +1,7 @@
 ﻿using BoardGameSchedulerBackend.BusinessLayer;
 using BoardGameSchedulerBackend.DataLayer;
 using Microsoft.AspNetCore.Identity;
+using SignInResult = BoardGameSchedulerBackend.BusinessLayer.SignInResult;
 
 namespace BoardGameSchedulerBackend.Infrastructure
 {
@@ -43,9 +44,9 @@ namespace BoardGameSchedulerBackend.Infrastructure
 			};
 		}
 
-		public void SignIn(string userName, string passwrd)
+		public SignInResult SignIn(string userName, string passwrd)
 		{
-			
+			return new SignInResult();
 		}
 
 		private UserCreationResult BuildUserCreationResult(IdentityResult identityResult)
