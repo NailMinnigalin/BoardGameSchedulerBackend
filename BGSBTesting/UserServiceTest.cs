@@ -102,5 +102,29 @@ namespace BGSBTesting
 
 			Assert.IsNotNull(signInResult);
 		}
+
+		[TestMethod]
+		public async Task SignInAsyncReturnsSignInResultWithIsSuccesfulFlagTrueWhenSignInWasSuccesful()
+		{
+			_iUserRepositoryMock
+				.Setup(ur => ur.SignInAsync(It.IsAny<string>(), It.IsAny<string>()))
+				.ReturnsAsync(new SignInResult() { IsSuccesful = true });
+
+			var signInResult = await _userService.SignInAsync("userName", "password");
+
+			Assert.IsTrue(signInResult.IsSuccesful);
+		}
+
+		[TestMethod]
+		public async Task SignInAsyncReturnsSignInResultWithIsSuccesfulFlagFalseWhenSignInWasFail()
+		{
+			_iUserRepositoryMock
+				.Setup(ur => ur.SignInAsync(It.IsAny<string>(), It.IsAny<string>()))
+				.ReturnsAsync(new SignInResult() { IsSuccesful = false });
+
+			var signInResult = await _userService.SignInAsync("userName", "password");
+
+			Assert.IsFalse(signInResult.IsSuccesful);
+		}
 	}
 }
