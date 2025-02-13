@@ -101,6 +101,14 @@ namespace BGSBTesting
 			Assert.IsInstanceOfType<SignInResult>(signInResult);
 		}
 
+		[TestMethod]
+		public void SignInReturnsSignInResultWithSuccesfulFlagWhenSignInWasSuccesful()
+		{
+			var signInResult = _identityUserRepository.SignIn("userName", "password");
+
+			Assert.IsTrue(signInResult.IsSuccesful);
+		}
+
 		private async Task TestThatIdentityErrorLeadsToCorrespondErrorCode(IdentityError identityError, UserCreationResult.ErrorCode expectedErrorCode)
 		{
 			_userManagerMock

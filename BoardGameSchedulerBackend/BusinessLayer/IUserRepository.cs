@@ -34,7 +34,7 @@ namespace BoardGameSchedulerBackend.BusinessLayer
 
 	public class SignInResult
 	{
-
+		public bool IsSuccesful => true;
 	}
 
 	public interface IUserRepository
