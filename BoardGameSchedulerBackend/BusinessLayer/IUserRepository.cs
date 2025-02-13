@@ -41,5 +41,6 @@ namespace BoardGameSchedulerBackend.BusinessLayer
 	{
 		Task<User?> GetByIdAsync(Guid id);
 		Task<UserCreationResult> CreateAsync(string userName, string userEmail, string password);
+		Task<SignInResult> SignIn(string userName, string passwrd);
 	}
 }
