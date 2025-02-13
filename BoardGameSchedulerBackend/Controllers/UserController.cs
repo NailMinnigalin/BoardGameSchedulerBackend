@@ -4,17 +4,17 @@ using Microsoft.AspNetCore.Mvc;
 namespace BoardGameSchedulerBackend.Controllers
 {
 	[ApiController]
-	[Route("[controller]")]
-	public class RegistrationController : ControllerBase
+	public class UserController : ControllerBase
 	{
 		private readonly IUserService _userService;
 
-		public RegistrationController(IUserService userService)
+		public UserController(IUserService userService)
 		{
 			_userService = userService;
 		}
 
-		[HttpPost("/")]
+		[HttpPost]
+		[Route("/register")]
 		[ProducesResponseType(StatusCodes.Status201Created)]
 		[ProducesResponseType(StatusCodes.Status400BadRequest)]
 		public async Task<IActionResult> Register([FromBody] RegistrationData registrationData)
@@ -24,12 +24,28 @@ namespace BoardGameSchedulerBackend.Controllers
 				return Created("", userCreationResult);
 			return BadRequest(userCreationResult);
 		}
+
+		[HttpPost]
+		[Route("/signin")]
+		public async Task<IActionResult> SignIn([FromBody] SignInData signInData)
+		{
+			var result = await _userService.SignInAsync(signInData.UserName, signInData.Password);
+			if (result.IsSuccesful)
+				return Ok();
+			return BadRequest();
+		}
 	}
 
 	public class RegistrationData()
 	{
 		public required string UserName { get; set; }
 		public required string Email { get; set; }
+		public required string Password { get; set; }
+	}
+
+	public class SignInData()
+	{
+		public required string UserName { get; set; }
 		public required string Password { get; set; }
 	}
 }

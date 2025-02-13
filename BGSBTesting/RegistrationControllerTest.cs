@@ -2,6 +2,7 @@
 using BoardGameSchedulerBackend.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using SignInResult = BoardGameSchedulerBackend.BusinessLayer.SignInResult;
 
 namespace BGSBTesting
 {
@@ -9,7 +10,7 @@ namespace BGSBTesting
 	public class RegistrationControllerTest
 	{
 		private Mock<IUserService> _iUserService = default!;
-		private RegistrationController registrationController = default!;
+		private UserController registrationController = default!;
 
 		[TestInitialize]
 		public void TestInitialize()
@@ -19,7 +20,7 @@ namespace BGSBTesting
 		}
 
 		[TestMethod]
-		public async Task RegistrationControllerHasRegisterEndpointThatTakesRegistrationDataToRegisterUser()
+		public async Task UserControllerControllerHasRegisterEndpointThatTakesRegistrationDataToRegisterUser()
 		{
 			SetupIUserServiceRegisterUserAsyncToSuccesfulResult();
 
@@ -103,6 +104,41 @@ namespace BGSBTesting
 			var userCreationResult = (badRequestObjectResult.Value as UserCreationResult)!;
 
 			Assert.IsTrue(userCreationResult.Errors[0] == expectedError);
+		}
+
+		[TestMethod]
+		public async Task UserControllerHasSignInEndpoint()
+		{
+			SetupIUserServiceSignInToReturnSuccess(true);
+
+			await registrationController.SignIn(new SignInData { UserName = "userName", Password = "password" });
+		}
+
+		[TestMethod]
+		public async Task SignInReturnOkResultWhenSignInWasSuccesful()
+		{
+			SetupIUserServiceSignInToReturnSuccess(true);
+
+			var result = await registrationController.SignIn(new SignInData { UserName = "userName", Password = "password" });
+
+			Assert.IsInstanceOfType<OkResult>(result);
+		}
+
+		[TestMethod]
+		public async Task SignInReturnBadRequestResultWhenSignInWasFail()
+		{
+			SetupIUserServiceSignInToReturnSuccess(false);
+
+			var result = await registrationController.SignIn(new SignInData { UserName = "userName", Password = "password" });
+
+			Assert.IsInstanceOfType<BadRequestResult>(result);
+		}
+
+		private void SetupIUserServiceSignInToReturnSuccess(bool success)
+		{
+			_iUserService
+				.Setup(us => us.SignInAsync(It.IsAny<string>(), It.IsAny<string>()))
+				.ReturnsAsync(new SignInResult { IsSuccesful = success });
 		}
 
 		private void SetupIUserServiceRegisterUserAsyncToReturnError(UserCreationResult.ErrorCode error)
