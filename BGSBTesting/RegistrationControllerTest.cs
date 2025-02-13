@@ -21,9 +21,7 @@ namespace BGSBTesting
 		[TestMethod]
 		public async Task RegistrationControllerHasRegisterEndpointThatTakesRegistrationDataToRegisterUser()
 		{
-			_iUserService
-				.Setup(us => us.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-				.ReturnsAsync(new UserCreationResult());
+			SetupIUserServiceRegisterUserAsyncToSuccesfulResult();
 
 			await registrationController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
 		}
@@ -31,9 +29,7 @@ namespace BGSBTesting
 		[TestMethod]
 		public async Task RegisterReturnsCreatedResultOnSuccesfulUserCreation()
 		{
-			_iUserService
-				.Setup(us => us.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-				.ReturnsAsync(new UserCreationResult());
+			SetupIUserServiceRegisterUserAsyncToSuccesfulResult();
 
 			var actionResult = await registrationController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
 
@@ -43,9 +39,7 @@ namespace BGSBTesting
 		[TestMethod]
 		public async Task ReigsterReturnsCreatedResultWithUserCreationResultValueOnSuccesfulUserCreation()
 		{
-			_iUserService
-				.Setup(us => us.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-				.ReturnsAsync(new UserCreationResult());
+			SetupIUserServiceRegisterUserAsyncToSuccesfulResult();
 
 			var actionResult = await registrationController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
 			var createdResult = (actionResult as CreatedResult)!;
@@ -56,9 +50,7 @@ namespace BGSBTesting
 		[TestMethod]
 		public async Task ReigsterReturnsCreatedResultWithUserCreationResultValueWithSucessStatusOnSuccesfulUserCreation()
 		{
-			_iUserService
-				.Setup(us => us.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-				.ReturnsAsync(new UserCreationResult());
+			SetupIUserServiceRegisterUserAsyncToSuccesfulResult();
 
 			var actionResult = await registrationController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
 			var createdResult = (actionResult as CreatedResult)!;
@@ -67,14 +59,10 @@ namespace BGSBTesting
 			Assert.IsTrue(userCreationResult.IsSuccessful);
 		}
 
-
 		[TestMethod]
 		public async Task RegisterReturnsBadRequstResultWhenErrorOccurs()
 		{
-			var error = UserCreationResult.ErrorCode.InvalidEmail;
-			_iUserService
-				.Setup(us => us.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-				.ReturnsAsync(new UserCreationResult([error]));
+			SetupIUserServiceRegisterUserAsyncToReturnError(UserCreationResult.ErrorCode.InvalidEmail);
 
 			var actionResult = await registrationController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
 
@@ -84,10 +72,7 @@ namespace BGSBTesting
 		[TestMethod]
 		public async Task RegisterReturnsBadRequstResultWithUserCreationResultValueWhenErrorOccurs()
 		{
-			var error = UserCreationResult.ErrorCode.InvalidEmail;
-			_iUserService
-				.Setup(us => us.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-				.ReturnsAsync(new UserCreationResult([error]));
+			SetupIUserServiceRegisterUserAsyncToReturnError(UserCreationResult.ErrorCode.InvalidEmail);
 
 			var actionResult = await registrationController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
 			var badRequestObjectResult = actionResult as BadRequestObjectResult;
@@ -98,10 +83,7 @@ namespace BGSBTesting
 		[TestMethod]
 		public async Task RegisterReturnsBadRequstResultWithUserCreationResultValueWithErrorWhenErrorOccurs()
 		{
-			var error = UserCreationResult.ErrorCode.InvalidEmail;
-			_iUserService
-				.Setup(us => us.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-				.ReturnsAsync(new UserCreationResult([error]));
+			SetupIUserServiceRegisterUserAsyncToReturnError(UserCreationResult.ErrorCode.InvalidEmail);
 
 			var actionResult = await registrationController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
 			var badRequestObjectResult = (actionResult as BadRequestObjectResult)!;
@@ -114,15 +96,27 @@ namespace BGSBTesting
 		public async Task RegisterReturnsBadRequstResultWithUserCreationResultValueWithRightErrorWhenErrorOccurs()
 		{
 			var expectedError = UserCreationResult.ErrorCode.InvalidEmail;
-			_iUserService
-				.Setup(us => us.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-				.ReturnsAsync(new UserCreationResult([expectedError]));
+			SetupIUserServiceRegisterUserAsyncToReturnError(expectedError);
 
 			var actionResult = await registrationController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
 			var badRequestObjectResult = (actionResult as BadRequestObjectResult)!;
 			var userCreationResult = (badRequestObjectResult.Value as UserCreationResult)!;
 
 			Assert.IsTrue(userCreationResult.Errors[0] == expectedError);
+		}
+
+		private void SetupIUserServiceRegisterUserAsyncToReturnError(UserCreationResult.ErrorCode error)
+		{
+			_iUserService
+				.Setup(us => us.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+				.ReturnsAsync(new UserCreationResult([error]));
+		}
+
+		private void SetupIUserServiceRegisterUserAsyncToSuccesfulResult()
+		{
+			_iUserService
+				.Setup(us => us.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+				.ReturnsAsync(new UserCreationResult());
 		}
 	}
 }

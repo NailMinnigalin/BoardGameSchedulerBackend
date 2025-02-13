@@ -94,9 +94,7 @@ namespace BGSBTesting
 		[TestMethod]
 		public async Task SignInAsyncReturnsSignInResult()
 		{
-			_iUserRepositoryMock
-				.Setup(ur => ur.SignInAsync(It.IsAny<string>(), It.IsAny<string>()))
-				.ReturnsAsync(new SignInResult() { IsSuccesful = true });
+			SetupIUserRepositorySignInAsyncToReturnSucess(true);
 
 			var signInResult = await _userService.SignInAsync("userName", "password");
 
@@ -106,9 +104,7 @@ namespace BGSBTesting
 		[TestMethod]
 		public async Task SignInAsyncReturnsSignInResultWithIsSuccesfulFlagTrueWhenSignInWasSuccesful()
 		{
-			_iUserRepositoryMock
-				.Setup(ur => ur.SignInAsync(It.IsAny<string>(), It.IsAny<string>()))
-				.ReturnsAsync(new SignInResult() { IsSuccesful = true });
+			SetupIUserRepositorySignInAsyncToReturnSucess(true);
 
 			var signInResult = await _userService.SignInAsync("userName", "password");
 
@@ -118,13 +114,18 @@ namespace BGSBTesting
 		[TestMethod]
 		public async Task SignInAsyncReturnsSignInResultWithIsSuccesfulFlagFalseWhenSignInWasFail()
 		{
-			_iUserRepositoryMock
-				.Setup(ur => ur.SignInAsync(It.IsAny<string>(), It.IsAny<string>()))
-				.ReturnsAsync(new SignInResult() { IsSuccesful = false });
+			SetupIUserRepositorySignInAsyncToReturnSucess(false);
 
 			var signInResult = await _userService.SignInAsync("userName", "password");
 
 			Assert.IsFalse(signInResult.IsSuccesful);
+		}
+
+		private void SetupIUserRepositorySignInAsyncToReturnSucess(bool sucess)
+		{
+			_iUserRepositoryMock
+				.Setup(ur => ur.SignInAsync(It.IsAny<string>(), It.IsAny<string>()))
+				.ReturnsAsync(new SignInResult() { IsSuccesful = sucess });
 		}
 	}
 }

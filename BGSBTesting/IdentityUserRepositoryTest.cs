@@ -37,36 +37,6 @@ namespace BGSBTesting
 		}
 
 		[TestMethod]
-		public async Task GetByIdAsyncSuccessfulGetExistingUser()
-		{
-			User existedUserId = new() { Email = "validEmail@example.com", UserName = "ValidUserName", Id = new Guid() };
-			_userManagerMock
-				.Setup(um => um.FindByIdAsync(existedUserId.Id.ToString()))
-				.ReturnsAsync(new IdentityUser { Email = existedUserId.Email, UserName = existedUserId.UserName });
-
-			var foundUser =  await _identityUserRepository.GetByIdAsync(existedUserId.Id);
-			
-			Assert.IsTrue(
-				existedUserId.Id == foundUser!.Id && 
-				existedUserId.Email == foundUser.Email && 
-				existedUserId.UserName == foundUser.UserName
-			);
-		}
-
-		[TestMethod]
-		public async Task GetByIdAsyncGetNullWhenUserNotFound()
-		{
-			IdentityUser? nullIdentity = null;
-			_userManagerMock
-				.Setup(um => um.FindByIdAsync(It.IsAny<string>()))
-				.ReturnsAsync(nullIdentity);
-
-			var user = await _identityUserRepository.GetByIdAsync(new Guid());
-
-			Assert.IsNull(user);
-		}
-
-		[TestMethod]
 		public async Task CreateAsyncReturnsUserCreationResultWithAppropriateErrorWhenUserCreationErrorHappened()
 		{
 			IdentityErrorDescriber _identityErrorDescriber = new IdentityErrorDescriber();
@@ -92,11 +62,39 @@ namespace BGSBTesting
 		}
 
 		[TestMethod]
+		public async Task GetByIdAsyncSuccessfulGetExistingUser()
+		{
+			User existedUserId = new() { Email = "validEmail@example.com", UserName = "ValidUserName", Id = new Guid() };
+			_userManagerMock
+				.Setup(um => um.FindByIdAsync(existedUserId.Id.ToString()))
+				.ReturnsAsync(new IdentityUser { Email = existedUserId.Email, UserName = existedUserId.UserName });
+
+			var foundUser = await _identityUserRepository.GetByIdAsync(existedUserId.Id);
+
+			Assert.IsTrue(
+				existedUserId.Id == foundUser!.Id &&
+				existedUserId.Email == foundUser.Email &&
+				existedUserId.UserName == foundUser.UserName
+			);
+		}
+
+		[TestMethod]
+		public async Task GetByIdAsyncGetNullWhenUserNotFound()
+		{
+			IdentityUser? nullIdentity = null;
+			_userManagerMock
+				.Setup(um => um.FindByIdAsync(It.IsAny<string>()))
+				.ReturnsAsync(nullIdentity);
+
+			var user = await _identityUserRepository.GetByIdAsync(new Guid());
+
+			Assert.IsNull(user);
+		}
+
+		[TestMethod]
 		public async Task IdentityUserRepositoryHasSignInMethod()
 		{
-			_signInManagerMock
-				.Setup(sm => sm.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
-				.ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Success);
+			SetupSignInManagerPasswordSignInAsyncToReturnSuccess();
 
 			await _identityUserRepository.SignInAsync("userName", "password");
 		}
@@ -104,9 +102,7 @@ namespace BGSBTesting
 		[TestMethod]
 		public async Task SignInReturnsSignInResult()
 		{
-			_signInManagerMock
-				.Setup(sm => sm.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
-				.ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Success);
+			SetupSignInManagerPasswordSignInAsyncToReturnSuccess();
 
 			var signInResult = await _identityUserRepository.SignInAsync("userName", "password");
 
@@ -116,9 +112,7 @@ namespace BGSBTesting
 		[TestMethod]
 		public async Task SignInReturnsSignInResultWithSuccesfulFlagTrueWhenSignInWasSuccesful()
 		{
-			_signInManagerMock
-				.Setup(sm => sm.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
-				.ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Success);
+			SetupSignInManagerPasswordSignInAsyncToReturnSuccess();
 
 			var signInResult = await _identityUserRepository.SignInAsync("userName", "password");
 
@@ -175,7 +169,7 @@ namespace BGSBTesting
 			);
 		}
 
-		private Mock<SignInManager<IdentityUser>> CreateSignInManager(Mock<UserManager<IdentityUser>> userManagerMock)
+		private static Mock<SignInManager<IdentityUser>> CreateSignInManager(Mock<UserManager<IdentityUser>> userManagerMock)
 		{
 			var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
 			var userClaimsPrincipalFactoryMock = new Mock<IUserClaimsPrincipalFactory<IdentityUser>>();
@@ -193,6 +187,13 @@ namespace BGSBTesting
 				authenticationSchemeProviderMock.Object,
 				userConfirmationMock.Object
 			);
+		}
+
+		private void SetupSignInManagerPasswordSignInAsyncToReturnSuccess()
+		{
+			_signInManagerMock
+							.Setup(sm => sm.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
+							.ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Success);
 		}
 	}
 }
