@@ -86,9 +86,21 @@ namespace BGSBTesting
 		}
 
 		[TestMethod]
-		public async Task UserServiceHasSignInMethod()
+		public async Task UserServiceHasSignInAsyncMethod()
 		{
-			_userService.SignIn("userName", "password");
+			await _userService.SignInAsync("userName", "password");
+		}
+
+		[TestMethod]
+		public async Task SignInAsyncReturnsSignInResult()
+		{
+			_iUserRepositoryMock
+				.Setup(ur => ur.SignInAsync(It.IsAny<string>(), It.IsAny<string>()))
+				.ReturnsAsync(new SignInResult() { IsSuccesful = true });
+
+			var signInResult = await _userService.SignInAsync("userName", "password");
+
+			Assert.IsNotNull(signInResult);
 		}
 	}
 }

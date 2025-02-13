@@ -98,7 +98,7 @@ namespace BGSBTesting
 				.Setup(sm => sm.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
 				.ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Success);
 
-			await _identityUserRepository.SignIn("userName", "password");
+			await _identityUserRepository.SignInAsync("userName", "password");
 		}
 
 		[TestMethod]
@@ -108,7 +108,7 @@ namespace BGSBTesting
 				.Setup(sm => sm.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
 				.ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Success);
 
-			var signInResult = await _identityUserRepository.SignIn("userName", "password");
+			var signInResult = await _identityUserRepository.SignInAsync("userName", "password");
 
 			Assert.IsInstanceOfType<SignInResult>(signInResult);
 		}
@@ -120,7 +120,7 @@ namespace BGSBTesting
 				.Setup(sm => sm.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
 				.ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Success);
 
-			var signInResult = await _identityUserRepository.SignIn("userName", "password");
+			var signInResult = await _identityUserRepository.SignInAsync("userName", "password");
 
 			Assert.IsTrue(signInResult.IsSuccesful);
 		}
@@ -132,7 +132,7 @@ namespace BGSBTesting
 				.Setup(sm => sm.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
 				.ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Failed);
 
-			var signInResult = await _identityUserRepository.SignIn("userName", "password");
+			var signInResult = await _identityUserRepository.SignInAsync("userName", "password");
 
 			Assert.IsFalse(signInResult.IsSuccesful);
 		}

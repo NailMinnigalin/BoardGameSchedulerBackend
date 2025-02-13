@@ -46,7 +46,7 @@ namespace BoardGameSchedulerBackend.Infrastructure
 			};
 		}
 
-		public async Task<SignInResult> SignIn(string userName, string passwrd)
+		public async Task<SignInResult> SignInAsync(string userName, string passwrd)
 		{
 			var result = await _signInManager.PasswordSignInAsync(userName, passwrd, false, false);
 			return new SignInResult { IsSuccesful = result.Succeeded };
