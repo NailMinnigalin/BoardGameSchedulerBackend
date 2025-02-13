@@ -19,5 +19,10 @@ namespace BoardGameSchedulerBackend.BusinessLayer
 		{
 			return await _userRepository.GetByIdAsync(id);
 		}
+
+		public void SignIn(string userName, string password)
+		{
+			
+		}
 	}
 }

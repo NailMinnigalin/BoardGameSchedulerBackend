@@ -84,5 +84,11 @@ namespace BGSBTesting
 
 			Assert.IsNull(result);
 		}
+
+		[TestMethod]
+		public async Task UserServiceHasSignInMethod()
+		{
+			_userService.SignIn("userName", "password");
+		}
 	}
 }
