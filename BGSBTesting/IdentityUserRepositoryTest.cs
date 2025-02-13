@@ -12,13 +12,13 @@ namespace BGSBTesting
 	public class IdentityUserRepositoryTest
 	{
 		private Mock<UserManager<IdentityUser>> _userManagerMock = default!;
-		private IdentityUserRepository _repository = default!;
+		private IdentityUserRepository _identityUserRepository = default!;
 
 		[TestInitialize]
 		public void TestInitialize()
 		{
 			_userManagerMock = CreateUserManagerMock();
-			_repository = new IdentityUserRepository(_userManagerMock.Object);
+			_identityUserRepository = new IdentityUserRepository(_userManagerMock.Object);
 		}
 
 		[TestMethod]
@@ -28,7 +28,7 @@ namespace BGSBTesting
 				.Setup(um => um.CreateAsync(It.IsAny<IdentityUser>(), It.IsAny<string>()))
 				.ReturnsAsync(IdentityResult.Success);
 
-		   await _repository.CreateAsync("ValidUserName", "validEmail@example.com", "ValidPassword");
+		   await _identityUserRepository.CreateAsync("ValidUserName", "validEmail@example.com", "ValidPassword");
 		}
 
 		[TestMethod]
@@ -39,7 +39,7 @@ namespace BGSBTesting
 				.Setup(um => um.FindByIdAsync(existedUserId.Id.ToString()))
 				.ReturnsAsync(new IdentityUser { Email = existedUserId.Email, UserName = existedUserId.UserName });
 
-			var foundUser =  await _repository.GetByIdAsync(existedUserId.Id);
+			var foundUser =  await _identityUserRepository.GetByIdAsync(existedUserId.Id);
 			
 			Assert.IsTrue(
 				existedUserId.Id == foundUser!.Id && 
@@ -56,7 +56,7 @@ namespace BGSBTesting
 				.Setup(um => um.FindByIdAsync(It.IsAny<string>()))
 				.ReturnsAsync(nullIdentity);
 
-			var user = await _repository.GetByIdAsync(new Guid());
+			var user = await _identityUserRepository.GetByIdAsync(new Guid());
 
 			Assert.IsNull(user);
 		}
@@ -86,13 +86,21 @@ namespace BGSBTesting
 			}
 		}
 
+		[TestMethod]
+		public void IdentityUserRepositoryHasSignInMethod()
+		{
+			_identityUserRepository.SignIn("userName", "password");
+		}
+
+
+
 		private async Task TestThatIdentityErrorLeadsToCorrespondErrorCode(IdentityError identityError, UserCreationResult.ErrorCode expectedErrorCode)
 		{
 			_userManagerMock
 				.Setup(um => um.CreateAsync(It.IsAny<IdentityUser>(), It.IsAny<string>()))
 				.ReturnsAsync(IdentityResult.Failed(identityError));
 
-			UserCreationResult userCreationResult = await _repository.CreateAsync("ValidUserName", "validEmail@example.com", "ValidPassword");
+			UserCreationResult userCreationResult = await _identityUserRepository.CreateAsync("ValidUserName", "validEmail@example.com", "ValidPassword");
 
 			Assert.IsTrue(userCreationResult.Errors.Count == 1, "Not only 1 error");
 			Assert.IsTrue(userCreationResult.Errors.First() == expectedErrorCode, $"Expected: {expectedErrorCode} was: {userCreationResult.Errors.First()}");

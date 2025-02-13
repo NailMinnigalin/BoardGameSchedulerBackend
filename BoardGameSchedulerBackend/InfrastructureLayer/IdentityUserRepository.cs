@@ -43,6 +43,11 @@ namespace BoardGameSchedulerBackend.Infrastructure
 			};
 		}
 
+		public void SignIn(string userName, string passwrd)
+		{
+			
+		}
+
 		private UserCreationResult BuildUserCreationResult(IdentityResult identityResult)
 		{
 			if (identityResult.Succeeded)
