@@ -1,6 +1,8 @@
 ﻿using BoardGameSchedulerBackend.BusinessLayer;
 using BoardGameSchedulerBackend.DataLayer;
 using BoardGameSchedulerBackend.Infrastructure;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -13,13 +15,15 @@ namespace BGSBTesting
 	public class IdentityUserRepositoryTest
 	{
 		private Mock<UserManager<IdentityUser>> _userManagerMock = default!;
+		private Mock<SignInManager<IdentityUser>> _signInManagerMock = default!;
 		private IdentityUserRepository _identityUserRepository = default!;
 
 		[TestInitialize]
 		public void TestInitialize()
 		{
 			_userManagerMock = CreateUserManagerMock();
-			_identityUserRepository = new IdentityUserRepository(_userManagerMock.Object);
+			_signInManagerMock = CreateSignInManager(_userManagerMock);
+			_identityUserRepository = new IdentityUserRepository(_userManagerMock.Object, _signInManagerMock.Object);
 		}
 
 		[TestMethod]
@@ -88,25 +92,49 @@ namespace BGSBTesting
 		}
 
 		[TestMethod]
-		public void IdentityUserRepositoryHasSignInMethod()
+		public async Task IdentityUserRepositoryHasSignInMethod()
 		{
-			_identityUserRepository.SignIn("userName", "password");
+			_signInManagerMock
+				.Setup(sm => sm.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
+				.ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Success);
+
+			await _identityUserRepository.SignIn("userName", "password");
 		}
 
 		[TestMethod]
-		public void SignInReturnsSignInResult()
+		public async Task SignInReturnsSignInResult()
 		{
-			var signInResult = _identityUserRepository.SignIn("userName", "password");
+			_signInManagerMock
+				.Setup(sm => sm.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
+				.ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Success);
+
+			var signInResult = await _identityUserRepository.SignIn("userName", "password");
 
 			Assert.IsInstanceOfType<SignInResult>(signInResult);
 		}
 
 		[TestMethod]
-		public void SignInReturnsSignInResultWithSuccesfulFlagWhenSignInWasSuccesful()
+		public async Task SignInReturnsSignInResultWithSuccesfulFlagTrueWhenSignInWasSuccesful()
 		{
-			var signInResult = _identityUserRepository.SignIn("userName", "password");
+			_signInManagerMock
+				.Setup(sm => sm.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
+				.ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Success);
+
+			var signInResult = await _identityUserRepository.SignIn("userName", "password");
 
 			Assert.IsTrue(signInResult.IsSuccesful);
+		}
+
+		[TestMethod]
+		public async Task SignInReturnsSignInResultWithSuccesfulFlagFalseWhenSignInWasFailed()
+		{
+			_signInManagerMock
+				.Setup(sm => sm.PasswordSignInAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>()))
+				.ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Failed);
+
+			var signInResult = await _identityUserRepository.SignIn("userName", "password");
+
+			Assert.IsFalse(signInResult.IsSuccesful);
 		}
 
 		private async Task TestThatIdentityErrorLeadsToCorrespondErrorCode(IdentityError identityError, UserCreationResult.ErrorCode expectedErrorCode)
@@ -143,7 +171,28 @@ namespace BGSBTesting
 				keyNormalizerMock.Object,
 				errorsMock.Object,
 				servicesMock.Object,
-				loggerMock.Object);
+				loggerMock.Object
+			);
+		}
+
+		private Mock<SignInManager<IdentityUser>> CreateSignInManager(Mock<UserManager<IdentityUser>> userManagerMock)
+		{
+			var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+			var userClaimsPrincipalFactoryMock = new Mock<IUserClaimsPrincipalFactory<IdentityUser>>();
+			var identityOptionsMock = new Mock<IOptions<IdentityOptions>>();
+			var loggerMock = new Mock<ILogger<SignInManager<IdentityUser>>>();
+			var authenticationSchemeProviderMock = new Mock<IAuthenticationSchemeProvider>();
+			var userConfirmationMock = new Mock<IUserConfirmation<IdentityUser>>();
+
+			return new Mock<SignInManager<IdentityUser>>(
+				userManagerMock.Object,
+				httpContextAccessorMock.Object,
+				userClaimsPrincipalFactoryMock.Object,
+				identityOptionsMock.Object,
+				loggerMock.Object,
+				authenticationSchemeProviderMock.Object,
+				userConfirmationMock.Object
+			);
 		}
 	}
 }

@@ -11,11 +11,13 @@ namespace BoardGameSchedulerBackend.Infrastructure
 	public class IdentityUserRepository : IUserRepository
 	{
 		private readonly UserManager<IdentityUser> _userManager;
+		private readonly SignInManager<IdentityUser> _signInManager;
 		private readonly IdentityErrorDescriber _identityErrorDescriber = new IdentityErrorDescriber();
 
-		public IdentityUserRepository(UserManager<IdentityUser> userManager)
+		public IdentityUserRepository(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
 		{
 			_userManager = userManager;
+			_signInManager = signInManager;
 		}
 
 		public async Task<UserCreationResult> CreateAsync(string userName, string userEmail, string password)
@@ -44,9 +46,10 @@ namespace BoardGameSchedulerBackend.Infrastructure
 			};
 		}
 
-		public SignInResult SignIn(string userName, string passwrd)
+		public async Task<SignInResult> SignIn(string userName, string passwrd)
 		{
-			return new SignInResult();
+			var result = await _signInManager.PasswordSignInAsync(userName, passwrd, false, false);
+			return new SignInResult { IsSuccesful = result.Succeeded };
 		}
 
 		private UserCreationResult BuildUserCreationResult(IdentityResult identityResult)
