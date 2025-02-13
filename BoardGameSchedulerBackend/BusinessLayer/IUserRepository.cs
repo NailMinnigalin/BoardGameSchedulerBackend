@@ -19,6 +19,7 @@ namespace BoardGameSchedulerBackend.BusinessLayer
 		}
 
 		public List<ErrorCode> Errors { get; init; }
+		public bool IsSuccessful => Errors.Count == 0;
 
 		public UserCreationResult()
 		{
