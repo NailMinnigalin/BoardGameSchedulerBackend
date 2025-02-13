@@ -67,21 +67,62 @@ namespace BGSBTesting
 			Assert.IsTrue(userCreationResult.IsSuccessful);
 		}
 
+
 		[TestMethod]
-		public async Task RegisterReturnsUserCreationResultWithCorrespodingErrorCodeWhenErrorOccurs()
+		public async Task RegisterReturnsBadRequstResultWhenErrorOccurs()
 		{
-			var exptectedError = UserCreationResult.ErrorCode.InvalidEmail;
+			var error = UserCreationResult.ErrorCode.InvalidEmail;
 			_iUserService
 				.Setup(us => us.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-				.ReturnsAsync(new UserCreationResult([exptectedError]));
+				.ReturnsAsync(new UserCreationResult([error]));
 
 			var actionResult = await registrationController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
-			var createdResult = actionResult as BadRequestObjectResult;
-			var userCreationResult = createdResult?.Value as UserCreationResult;
 
-			Assert.IsNotNull(userCreationResult, $"{nameof(userCreationResult)} is null");
-			Assert.IsTrue(userCreationResult.Errors.Count == 1, "Expected one error");
-			Assert.IsTrue(userCreationResult.Errors[0] == UserCreationResult.ErrorCode.InvalidEmail, $"Expected {exptectedError} but got {userCreationResult.Errors[0]}");
+			Assert.IsInstanceOfType<BadRequestObjectResult>(actionResult);
+		}
+
+		[TestMethod]
+		public async Task RegisterReturnsBadRequstResultWithUserCreationResultValueWhenErrorOccurs()
+		{
+			var error = UserCreationResult.ErrorCode.InvalidEmail;
+			_iUserService
+				.Setup(us => us.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+				.ReturnsAsync(new UserCreationResult([error]));
+
+			var actionResult = await registrationController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
+			var badRequestObjectResult = actionResult as BadRequestObjectResult;
+
+			Assert.IsNotNull(badRequestObjectResult);
+		}
+
+		[TestMethod]
+		public async Task RegisterReturnsBadRequstResultWithUserCreationResultValueWithErrorWhenErrorOccurs()
+		{
+			var error = UserCreationResult.ErrorCode.InvalidEmail;
+			_iUserService
+				.Setup(us => us.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+				.ReturnsAsync(new UserCreationResult([error]));
+
+			var actionResult = await registrationController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
+			var badRequestObjectResult = (actionResult as BadRequestObjectResult)!;
+			var userCreationResult = (badRequestObjectResult.Value as UserCreationResult)!;
+
+			Assert.IsTrue(userCreationResult.Errors.Count == 1);
+		}
+
+		[TestMethod]
+		public async Task RegisterReturnsBadRequstResultWithUserCreationResultValueWithRightErrorWhenErrorOccurs()
+		{
+			var expectedError = UserCreationResult.ErrorCode.InvalidEmail;
+			_iUserService
+				.Setup(us => us.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+				.ReturnsAsync(new UserCreationResult([expectedError]));
+
+			var actionResult = await registrationController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
+			var badRequestObjectResult = (actionResult as BadRequestObjectResult)!;
+			var userCreationResult = (badRequestObjectResult.Value as UserCreationResult)!;
+
+			Assert.IsTrue(userCreationResult.Errors[0] == expectedError);
 		}
 	}
 }
