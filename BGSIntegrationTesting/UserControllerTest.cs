@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using BoardGameSchedulerBackend.Controllers;
+using System.Net.Http.Json;
 
 namespace BGSIntegrationTesting
 {
@@ -44,12 +45,30 @@ namespace BGSIntegrationTesting
 
 			Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.BadRequest);
 		}
+
+		[TestMethod]
+		public async Task ApiHasSignInEndPointThatRequersRegistrationData()
+		{
+			_client = _factory.CreateClient();
+			var signInData = new SignInData { UserName = "TestName", Password = "testPassword" };
+			var jsonContent = JsonContent.Create(signInData);
+
+			var response = await _client.PostAsync("/signin", jsonContent);
+
+			Assert.IsFalse(response.StatusCode == System.Net.HttpStatusCode.NotFound);
+		}
 	}
 
 	public class RegistrationData()
 	{
 		public required string UserName { get; set; }
 		public required string Email { get; set; }
+		public required string Password { get; set; }
+	}
+
+	public class SignInData()
+	{
+		public required string UserName { get; set; }
 		public required string Password { get; set; }
 	}
 }
