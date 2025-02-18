@@ -9,5 +9,11 @@ namespace BoardGameSchedulerBackend.Infrastructure
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) :
 			base(options)
 		{ }
+
+		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+		{
+			optionsBuilder.ConfigureWarnings(warnings =>
+				warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+		}
 	}
 }

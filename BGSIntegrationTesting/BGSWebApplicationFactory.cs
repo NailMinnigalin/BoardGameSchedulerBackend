@@ -1,8 +1,11 @@
 ﻿using BoardGameSchedulerBackend.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Data.Common;
 
 namespace BGSIntegrationTesting
@@ -13,46 +16,38 @@ namespace BGSIntegrationTesting
 		{
 			builder.ConfigureServices(services =>
 			{
-				RemoveDbContextService(services);
-				RemoveDbConnectionService(services);
-				ConfigureInMemorySqliteDb(services);
+				// Remove any existing registrations for ApplicationDbContext and related options.
+				services.RemoveAll<ApplicationDbContext>();
+				services.RemoveAll<DbContextOptions<ApplicationDbContext>>();
+				services.RemoveAll<DbConnection>();
+
+				// Create a SQLite in-memory database with shared cache.
+				var sqliteConnection = new SqliteConnection("DataSource=:memory:");
+				sqliteConnection.Open();
+				services.AddSingleton<DbConnection>(sqliteConnection);
+
+				// Re-register ApplicationDbContext to use our SQLite connection.
+				services.AddDbContext<ApplicationDbContext>((container, options) =>
+				{
+					var connection = container.GetRequiredService<DbConnection>();
+					options.UseSqlite(connection);
+				});
+
+				services.AddIdentity<IdentityUser, IdentityRole>()
+					.AddEntityFrameworkStores<ApplicationDbContext>()
+					.AddDefaultTokenProviders();
+
+				// Build the service provider so we can run the migration on the same connection.
+				var sp = services.BuildServiceProvider();
+				using (var scope = sp.CreateScope())
+				{
+					var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+					// Use EnsureCreated() if you don't want to run migrations, or Migrate() if you do.
+					dbContext.Database.Migrate();
+				}
 			});
 
 			base.ConfigureWebHost(builder);
-		}
-
-		private static void ConfigureInMemorySqliteDb(IServiceCollection services)
-		{
-			// Add ApplicationDbContext with SQLite In-Memory Database
-			services.AddDbContext<ApplicationDbContext>(options =>
-			{
-				options.UseSqlite("DataSource=:memory:");
-			});
-
-			// Ensure the database is created and initialized
-			var sp = services.BuildServiceProvider();
-			using var scope = sp.CreateScope();
-			var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-			dbContext.Database.OpenConnection(); // Required for SQLite in-memory
-			dbContext.Database.EnsureCreated();
-		}
-
-		private static void RemoveDbConnectionService(IServiceCollection services)
-		{
-			var dbConnectionDescriptor = services.SingleOrDefault(
-								d => d.ServiceType ==
-									typeof(DbConnection));
-
-			services.Remove(dbConnectionDescriptor);
-		}
-
-		private static void RemoveDbContextService(IServiceCollection services)
-		{
-			var dbContextDescriptor = services.SingleOrDefault(
-								d => d.ServiceType ==
-									typeof(DbContextOptions<ApplicationDbContext>));
-
-			services.Remove(dbContextDescriptor);
 		}
 	}
 }
