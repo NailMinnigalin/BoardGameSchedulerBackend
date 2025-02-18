@@ -5,8 +5,8 @@ namespace BGSIntegrationTesting
 	[TestClass]
 	public class UserControllerTest
 	{
-		BGSWebApplicationFactory<Program> _factory;
-		private HttpClient _client;
+		BGSWebApplicationFactory<Program> _factory = default!;
+		private HttpClient _client = default!;
 
 		[TestInitialize]
 		public void TestInitialize()

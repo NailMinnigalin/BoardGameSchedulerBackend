@@ -17,16 +17,16 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Environment.EnvironmentName = "Test";
-if (builder.Environment.IsDevelopment())
+if (!builder.Environment.IsEnvironment("Test"))
 {
 	builder.Services.AddDbContext<ApplicationDbContext>(options =>
 		options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 	builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-	.AddEntityFrameworkStores<ApplicationDbContext>()
-	.AddDefaultTokenProviders();
+		.AddEntityFrameworkStores<ApplicationDbContext>()
+		.AddDefaultTokenProviders();
 }
+
 
 builder.Services.AddScoped<IUserRepository, IdentityUserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
