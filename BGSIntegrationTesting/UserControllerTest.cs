@@ -1,4 +1,5 @@
 ﻿using BoardGameSchedulerBackend.Controllers;
+using Newtonsoft.Json;
 using System.Net.Http.Json;
 
 namespace BGSIntegrationTesting
@@ -26,20 +27,18 @@ namespace BGSIntegrationTesting
 		public async Task ApiHasRegisterEndPointThatRequersRegistrationData()
 		{
 			_client = _factory.CreateClient();
-			var registrationData = new RegistrationData { Email = "testEmail@email.com", Password = "testPassword1!", UserName = "TestName" };
-			var jsonContent = JsonContent.Create(registrationData);
+			var jsonContent = JsonContent.Create(new RegistrationData { Email = "testEmail@email.com", Password = "testPassword1!", UserName = "TestName" });
 
 			var response = await _client.PostAsync("/register", jsonContent);
 
-			response.EnsureSuccessStatusCode();
+			Assert.IsFalse(response.StatusCode == System.Net.HttpStatusCode.NotFound);
 		}
 
 		[TestMethod]
-		public async Task RegisterEndPointReturn4400ForBadData()
+		public async Task RegisterEndPointReturn400ForBadData()
 		{
 			_client = _factory.CreateClient();
-			var registrationData = new RegistrationData { Email = "testEmail@email.com", Password = "testPassword", UserName = "TestName" };
-			var jsonContent = JsonContent.Create(registrationData);
+			var jsonContent = JsonContent.Create(new RegistrationData { Email = "testEmail@email.com", Password = "testPassword", UserName = "TestName" });
 
 			var response = await _client.PostAsync("/register", jsonContent);
 
@@ -50,12 +49,32 @@ namespace BGSIntegrationTesting
 		public async Task ApiHasSignInEndPointThatRequersRegistrationData()
 		{
 			_client = _factory.CreateClient();
-			var signInData = new SignInData { UserName = "TestName", Password = "testPassword" };
-			var jsonContent = JsonContent.Create(signInData);
+			var jsonContent = JsonContent.Create(new SignInData { UserName = "TestName", Password = "testPassword" });
 
 			var response = await _client.PostAsync("/signin", jsonContent);
 
 			Assert.IsFalse(response.StatusCode == System.Net.HttpStatusCode.NotFound);
+		}
+
+		[TestMethod]
+		public async Task SignInEndPointAllowSignInToExistingUser()
+		{
+			_client = _factory.CreateClient();
+			var email = "testEmail@email.com"; 
+			var password = "testPassword1!";
+			var userName = "TestName";
+			await RegisterUser(email, password, userName);
+			var signInJsonContent = JsonContent.Create(new SignInData { UserName = userName, Password = password });
+
+			var response = await _client.PostAsync("/signin", signInJsonContent);
+
+			Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK);
+		}
+
+		private async Task RegisterUser(string email, string password, string userName)
+		{
+			var registerJsonContent = JsonContent.Create( new RegistrationData { Email = email, Password = password, UserName = userName });
+			await _client.PostAsync("/register", registerJsonContent);
 		}
 	}
 
