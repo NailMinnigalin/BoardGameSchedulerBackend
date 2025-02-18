@@ -32,6 +32,18 @@ namespace BGSIntegrationTesting
 
 			response.EnsureSuccessStatusCode();
 		}
+
+		[TestMethod]
+		public async Task RegisterEndPointReturn4400ForBadData()
+		{
+			_client = _factory.CreateClient();
+			var registrationData = new RegistrationData { Email = "testEmail@email.com", Password = "testPassword", UserName = "TestName" };
+			var jsonContent = JsonContent.Create(registrationData);
+
+			var response = await _client.PostAsync("/register", jsonContent);
+
+			Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.BadRequest);
+		}
 	}
 
 	public class RegistrationData()
