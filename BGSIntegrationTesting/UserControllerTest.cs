@@ -71,6 +71,16 @@ namespace BGSIntegrationTesting
 			Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK);
 		}
 
+		[TestMethod]
+		public async Task ApiHasTestAuthEndPoint()
+		{
+			_client = _factory.CreateClient();
+
+			var response = await _client.GetAsync("/testauth");
+
+			Assert.IsFalse(response.StatusCode == System.Net.HttpStatusCode., $"response.StatusCode was {response.StatusCode}");
+		}
+
 		private async Task RegisterUser(string email, string password, string userName)
 		{
 			var registerJsonContent = JsonContent.Create( new RegistrationData { Email = email, Password = password, UserName = userName });

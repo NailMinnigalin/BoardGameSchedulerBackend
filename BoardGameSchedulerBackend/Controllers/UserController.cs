@@ -1,4 +1,5 @@
 ﻿using BoardGameSchedulerBackend.BusinessLayer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BoardGameSchedulerBackend.Controllers
@@ -33,6 +34,14 @@ namespace BoardGameSchedulerBackend.Controllers
 			if (result.IsSuccesful)
 				return Ok();
 			return BadRequest();
+		}
+
+		[HttpGet]
+		[Route("/testauth")]
+		[Authorize]
+		public IActionResult TestAuth()
+		{
+			return Ok();
 		}
 	}
 
