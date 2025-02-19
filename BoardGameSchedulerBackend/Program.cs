@@ -1,6 +1,5 @@
 using BoardGameSchedulerBackend.BusinessLayer;
 using BoardGameSchedulerBackend.Infrastructure;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,9 +17,6 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie();
-
 if (!builder.Environment.IsEnvironment("Test"))
 {
 	builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -30,7 +26,6 @@ if (!builder.Environment.IsEnvironment("Test"))
 		.AddEntityFrameworkStores<ApplicationDbContext>()
 		.AddDefaultTokenProviders();
 }
-
 
 builder.Services.AddScoped<IUserRepository, IdentityUserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();

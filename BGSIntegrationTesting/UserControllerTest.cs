@@ -78,7 +78,7 @@ namespace BGSIntegrationTesting
 
 			var response = await _client.GetAsync("/testauth");
 
-			Assert.IsFalse(response.StatusCode == System.Net.HttpStatusCode., $"response.StatusCode was {response.StatusCode}");
+			Assert.IsFalse(response.StatusCode == System.Net.HttpStatusCode.NotFound, $"response.StatusCode was {response.StatusCode}");
 		}
 
 		private async Task RegisterUser(string email, string password, string userName)
