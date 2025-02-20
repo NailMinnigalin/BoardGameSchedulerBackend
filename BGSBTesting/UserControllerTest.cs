@@ -10,13 +10,13 @@ namespace BGSBTesting
 	public class UserControllerTest
 	{
 		private Mock<IUserService> _iUserService = default!;
-		private UserController registrationController = default!;
+		private UserController userController = default!;
 
 		[TestInitialize]
 		public void TestInitialize()
 		{
 			_iUserService = new Mock<IUserService>();
-			registrationController = new(_iUserService.Object);
+			userController = new(_iUserService.Object);
 		}
 
 		[TestMethod]
@@ -24,7 +24,7 @@ namespace BGSBTesting
 		{
 			SetupIUserServiceRegisterUserAsyncToSuccesfulResult();
 
-			await registrationController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
+			await userController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
 		}
 
 		[TestMethod]
@@ -32,7 +32,7 @@ namespace BGSBTesting
 		{
 			SetupIUserServiceRegisterUserAsyncToSuccesfulResult();
 
-			var actionResult = await registrationController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
+			var actionResult = await userController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
 
 			Assert.IsInstanceOfType<CreatedResult>(actionResult);
 		}
@@ -42,7 +42,7 @@ namespace BGSBTesting
 		{
 			SetupIUserServiceRegisterUserAsyncToSuccesfulResult();
 
-			var actionResult = await registrationController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
+			var actionResult = await userController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
 			var createdResult = (actionResult as CreatedResult)!;
 
 			Assert.IsInstanceOfType<UserCreationResult>(createdResult.Value);
@@ -53,7 +53,7 @@ namespace BGSBTesting
 		{
 			SetupIUserServiceRegisterUserAsyncToSuccesfulResult();
 
-			var actionResult = await registrationController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
+			var actionResult = await userController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
 			var createdResult = (actionResult as CreatedResult)!;
 			var userCreationResult = (createdResult.Value as UserCreationResult)!;
 
@@ -65,7 +65,7 @@ namespace BGSBTesting
 		{
 			SetupIUserServiceRegisterUserAsyncToReturnError(UserCreationResult.ErrorCode.InvalidEmail);
 
-			var actionResult = await registrationController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
+			var actionResult = await userController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
 
 			Assert.IsInstanceOfType<BadRequestObjectResult>(actionResult);
 		}
@@ -75,7 +75,7 @@ namespace BGSBTesting
 		{
 			SetupIUserServiceRegisterUserAsyncToReturnError(UserCreationResult.ErrorCode.InvalidEmail);
 
-			var actionResult = await registrationController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
+			var actionResult = await userController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
 			var badRequestObjectResult = actionResult as BadRequestObjectResult;
 
 			Assert.IsNotNull(badRequestObjectResult);
@@ -86,7 +86,7 @@ namespace BGSBTesting
 		{
 			SetupIUserServiceRegisterUserAsyncToReturnError(UserCreationResult.ErrorCode.InvalidEmail);
 
-			var actionResult = await registrationController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
+			var actionResult = await userController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
 			var badRequestObjectResult = (actionResult as BadRequestObjectResult)!;
 			var userCreationResult = (badRequestObjectResult.Value as UserCreationResult)!;
 
@@ -99,7 +99,7 @@ namespace BGSBTesting
 			var expectedError = UserCreationResult.ErrorCode.InvalidEmail;
 			SetupIUserServiceRegisterUserAsyncToReturnError(expectedError);
 
-			var actionResult = await registrationController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
+			var actionResult = await userController.Register(new RegistrationData { UserName = "testUserName", Email = "testEmail@example.com", Password = "testPassword" });
 			var badRequestObjectResult = (actionResult as BadRequestObjectResult)!;
 			var userCreationResult = (badRequestObjectResult.Value as UserCreationResult)!;
 
@@ -111,7 +111,7 @@ namespace BGSBTesting
 		{
 			SetupIUserServiceSignInToReturnSuccess(true);
 
-			await registrationController.SignIn(new SignInData { UserName = "userName", Password = "password" });
+			await userController.SignIn(new SignInData { UserName = "userName", Password = "password" });
 		}
 
 		[TestMethod]
@@ -119,7 +119,7 @@ namespace BGSBTesting
 		{
 			SetupIUserServiceSignInToReturnSuccess(true);
 
-			var result = await registrationController.SignIn(new SignInData { UserName = "userName", Password = "password" });
+			var result = await userController.SignIn(new SignInData { UserName = "userName", Password = "password" });
 
 			Assert.IsInstanceOfType<OkResult>(result);
 		}
@@ -129,7 +129,7 @@ namespace BGSBTesting
 		{
 			SetupIUserServiceSignInToReturnSuccess(false);
 
-			var result = await registrationController.SignIn(new SignInData { UserName = "userName", Password = "password" });
+			var result = await userController.SignIn(new SignInData { UserName = "userName", Password = "password" });
 
 			Assert.IsInstanceOfType<BadRequestResult>(result);
 		}
