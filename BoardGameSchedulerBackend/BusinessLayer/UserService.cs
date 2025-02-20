@@ -24,5 +24,10 @@ namespace BoardGameSchedulerBackend.BusinessLayer
 		{
 			return await _userRepository.SignInAsync(userName, password);
 		}
+
+		public async Task SignOut()
+		{
+			await _userRepository.SignOut();
+		}
 	}
 }

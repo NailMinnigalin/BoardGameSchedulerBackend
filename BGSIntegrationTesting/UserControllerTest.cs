@@ -128,6 +128,22 @@ namespace BGSIntegrationTesting
 			Assert.IsFalse(response.StatusCode == System.Net.HttpStatusCode.NotFound, $"response.StatusCode was {response.StatusCode}");
 		}
 
+		[TestMethod]
+		public async Task SignOutEndPointAllowsToSignOut()
+		{
+			_client = _factory.CreateClient();
+			var email = "testEmail@email.com";
+			var password = "testPassword1!";
+			var userName = "TestName";
+			await RegisterUser(email, password, userName);
+			await SignIn(email, password, userName);
+
+			await _client.GetAsync("/signout");
+			
+			var response = await _client.GetAsync("/testauth");
+			Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.Unauthorized, $"response.StatusCode was {response.StatusCode}");
+		}
+
 		private async Task SignIn(string email, string password, string userName)
 		{
 			var registerJsonContent = JsonContent.Create(new RegistrationData { Email = email, Password = password, UserName = userName });

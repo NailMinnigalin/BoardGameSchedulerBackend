@@ -52,6 +52,11 @@ namespace BoardGameSchedulerBackend.Infrastructure
 			return new SignInResult { IsSuccesful = result.Succeeded };
 		}
 
+		public async Task SignOut()
+		{
+			await _signInManager.SignOutAsync();
+		}
+
 		private UserCreationResult BuildUserCreationResult(IdentityResult identityResult)
 		{
 			if (identityResult.Succeeded)

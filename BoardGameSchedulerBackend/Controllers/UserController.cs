@@ -40,7 +40,7 @@ namespace BoardGameSchedulerBackend.Controllers
 		[Route("/signout")]
 		public async Task UserSignOut()
 		{
-
+			await _userService.SignOut();
 		}
 
 		[HttpGet]
