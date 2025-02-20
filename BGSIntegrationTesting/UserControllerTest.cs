@@ -118,6 +118,16 @@ namespace BGSIntegrationTesting
 			Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK, $"response.StatusCode was {response.StatusCode}");
 		}
 
+		[TestMethod]
+		public async Task ApiHasSignOutEndpoint()
+		{
+			_client = _factory.CreateClient();
+
+			var response = await _client.GetAsync("/signout");
+
+			Assert.IsFalse(response.StatusCode == System.Net.HttpStatusCode.NotFound, $"response.StatusCode was {response.StatusCode}");
+		}
+
 		private async Task SignIn(string email, string password, string userName)
 		{
 			var registerJsonContent = JsonContent.Create(new RegistrationData { Email = email, Password = password, UserName = userName });

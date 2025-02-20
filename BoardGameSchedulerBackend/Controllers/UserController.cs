@@ -37,6 +37,13 @@ namespace BoardGameSchedulerBackend.Controllers
 		}
 
 		[HttpGet]
+		[Route("/signout")]
+		public async Task UserSignOut()
+		{
+
+		}
+
+		[HttpGet]
 		[Route("/testauth")]
 		[Authorize]
 		public IActionResult TestAuth()

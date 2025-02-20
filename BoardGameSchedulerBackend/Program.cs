@@ -1,7 +1,6 @@
 using BoardGameSchedulerBackend.BusinessLayer;
 using BoardGameSchedulerBackend.Infrastructure;
 using BoardGameSchedulerBackend.InfrastructureLayer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -37,8 +37,9 @@ namespace BoardGameSchedulerBackend.InfrastructureLayer
 				// Common cookie settings
 				options.Cookie.HttpOnly = true;
 				options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-				options.LoginPath = "/login";
+				options.LoginPath = "/signin";
 				options.AccessDeniedPath = "/accessdenied";
+				options.LogoutPath = "/signout";
 				options.SlidingExpiration = true;
 
 				// Override redirection to return status codes instead of redirects
