@@ -1,5 +1,7 @@
 ﻿using BoardGameSchedulerBackend.Infrastructure;
+using BoardGameSchedulerBackend.InfrastructureLayer;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
@@ -19,7 +21,8 @@ namespace BGSIntegrationTesting
 			{
 				CreateSQLiteDb(services);
 				RegisterApplicationDbContext(services);
-				AddIdentity(services);
+				services.AddCustomIdentity();
+
 				RunMigration(services);
 			});
 
@@ -34,13 +37,6 @@ namespace BGSIntegrationTesting
 				var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 				dbContext.Database.Migrate();
 			}
-		}
-
-		private static void AddIdentity(IServiceCollection services)
-		{
-			services.AddIdentity<IdentityUser, IdentityRole>()
-				.AddEntityFrameworkStores<ApplicationDbContext>()
-				.AddDefaultTokenProviders();
 		}
 
 		private static void RegisterApplicationDbContext(IServiceCollection services)
