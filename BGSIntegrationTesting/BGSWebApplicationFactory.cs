@@ -1,4 +1,5 @@
 ﻿using BoardGameSchedulerBackend.Infrastructure;
+using BoardGameSchedulerBackend.InfrastructureLayer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -20,31 +21,12 @@ namespace BGSIntegrationTesting
 			{
 				CreateSQLiteDb(services);
 				RegisterApplicationDbContext(services);
-				AddIdentity(services);
-				ApplyCookieSettings(services);
+				services.AddCustomIdentity();
 
 				RunMigration(services);
 			});
 
 			base.ConfigureWebHost(builder);
-		}
-
-		private static void ApplyCookieSettings(IServiceCollection services)
-		{
-			services.ConfigureApplicationCookie(options =>
-			{
-				options.Events.OnRedirectToLogin = context =>
-				{
-					context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-					return Task.CompletedTask;
-				};
-
-				options.Events.OnRedirectToAccessDenied = context =>
-				{
-					context.Response.StatusCode = StatusCodes.Status403Forbidden;
-					return Task.CompletedTask;
-				};
-			});
 		}
 
 		private static void RunMigration(IServiceCollection services)
@@ -55,13 +37,6 @@ namespace BGSIntegrationTesting
 				var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 				dbContext.Database.Migrate();
 			}
-		}
-
-		private static void AddIdentity(IServiceCollection services)
-		{
-			services.AddIdentity<IdentityUser, IdentityRole>()
-				.AddEntityFrameworkStores<ApplicationDbContext>()
-				.AddDefaultTokenProviders();
 		}
 
 		private static void RegisterApplicationDbContext(IServiceCollection services)

@@ -1,5 +1,6 @@
 using BoardGameSchedulerBackend.BusinessLayer;
 using BoardGameSchedulerBackend.Infrastructure;
+using BoardGameSchedulerBackend.InfrastructureLayer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,54 +23,8 @@ if (!builder.Environment.IsEnvironment("Test"))
 	builder.Services.AddDbContext<ApplicationDbContext>(options =>
 		options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-	builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-		.AddEntityFrameworkStores<ApplicationDbContext>()
-		.AddDefaultTokenProviders();
+	builder.Services.AddCustomIdentity();
 }
-
-builder.Services.Configure<IdentityOptions>(options =>
-{
-    // Password settings.
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireNonAlphanumeric = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequiredLength = 6;
-    options.Password.RequiredUniqueChars = 1;
-
-    // Lockout settings.
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-    options.Lockout.MaxFailedAccessAttempts = 5;
-    options.Lockout.AllowedForNewUsers = true;
-
-    // User settings.
-    options.User.AllowedUserNameCharacters =
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-    options.User.RequireUniqueEmail = false;
-});
-
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    // Cookie settings
-    options.Cookie.HttpOnly = true;
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-
-    options.LoginPath = "/login";
-    options.AccessDeniedPath = "/accessdenied";
-    options.SlidingExpiration = true;
-
-	options.Events.OnRedirectToLogin = context =>
-	{
-		context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-		return Task.CompletedTask;
-	};
-
-	options.Events.OnRedirectToAccessDenied = context =>
-	{
-		context.Response.StatusCode = StatusCodes.Status403Forbidden;
-		return Task.CompletedTask;
-	};
-});
 
 builder.Services.AddScoped<IUserRepository, IdentityUserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
