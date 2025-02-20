@@ -7,7 +7,7 @@ using SignInResult = BoardGameSchedulerBackend.BusinessLayer.SignInResult;
 namespace BGSBTesting
 {
 	[TestClass]
-	public class RegistrationControllerTest
+	public class UserControllerTest
 	{
 		private Mock<IUserService> _iUserService = default!;
 		private UserController registrationController = default!;
