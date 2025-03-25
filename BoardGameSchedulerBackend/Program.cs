@@ -25,6 +25,17 @@ builder.Services.AddCors(option =>
 	});
 });
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+	options.Cookie.SameSite = SameSiteMode.Lax;
+	options.Cookie.SecurePolicy = CookieSecurePolicy.None; // Only in development
+	options.Events.OnRedirectToLogin = context =>
+	{
+		context.Response.StatusCode = 401;
+		return Task.CompletedTask;
+	};
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
