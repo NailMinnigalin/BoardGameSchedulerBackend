@@ -42,6 +42,14 @@ namespace BoardGameSchedulerBackend.InfrastructureLayer
 				options.LogoutPath = "/signout";
 				options.SlidingExpiration = true;
 
+				options.Cookie.SameSite = SameSiteMode.Lax;
+				options.Cookie.SecurePolicy = CookieSecurePolicy.None; // Only in development
+				options.Events.OnRedirectToLogin = context =>
+				{
+					context.Response.StatusCode = 401;
+					return Task.CompletedTask;
+				};
+
 				// Override redirection to return status codes instead of redirects
 				options.Events.OnRedirectToLogin = context =>
 				{
