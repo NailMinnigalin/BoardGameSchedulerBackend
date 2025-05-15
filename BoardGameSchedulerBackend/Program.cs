@@ -41,6 +41,7 @@ if (!builder.Environment.IsEnvironment("Test"))
 
 builder.Services.AddScoped<IUserRepository, IdentityUserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IDbManager, DbManager>();
 
 var app = builder.Build();
 
