@@ -20,8 +20,8 @@ namespace BoardGameSchedulerBackend.Controllers
 		[Route("cleandb")]
 		public async Task<IActionResult> CleanDb()
 		{
-			bool result = await _dbManager.CleanDb();
-			return Ok(result);
+			await _dbManager.CleanDb();
+			return Ok();
 		}
 	}
 }

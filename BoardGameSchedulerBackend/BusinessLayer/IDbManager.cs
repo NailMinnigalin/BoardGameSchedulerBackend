@@ -2,6 +2,6 @@
 {
 	public interface IDbManager
 	{
-		Task<bool> CleanDb();
+		Task CleanDb();
 	}
 }

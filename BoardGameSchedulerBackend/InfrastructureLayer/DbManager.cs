@@ -1,5 +1,6 @@
 ﻿using BoardGameSchedulerBackend.BusinessLayer;
 using BoardGameSchedulerBackend.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 namespace BoardGameSchedulerBackend.InfrastructureLayer
 {
@@ -16,13 +17,10 @@ namespace BoardGameSchedulerBackend.InfrastructureLayer
 		/// Delete and recreate whole db
 		/// </summary>
 		/// <returns>true - if recreation was sucessful, false - if not</returns>
-		public async Task<bool> CleanDb()
+		public async Task CleanDb()
 		{
-			var deleteResult = await _applicationDbContext.Database.EnsureDeletedAsync();
-			if (!deleteResult) return deleteResult;
-
-			var createResult = await _applicationDbContext.Database.EnsureCreatedAsync();
-			return createResult;
-		}
+			await _applicationDbContext.Database.EnsureDeletedAsync();
+			await _applicationDbContext.Database.MigrateAsync();
+		}	
 	}
 }
