@@ -2,6 +2,7 @@
 using BoardGameSchedulerBackend.DataLayer;
 using Microsoft.OpenApi.Validations;
 using Moq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BGSBTesting
 {
@@ -21,9 +22,7 @@ namespace BGSBTesting
 		[TestMethod]
 		public async Task RegisterUserAsyncValidInputRegistersUserSuccessfully()
 		{
-			_iUserRepositoryMock	
-				.Setup(iur => iur.CreateAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-				.ReturnsAsync(new UserCreationResult());
+			SetupIUserRepositoryCreateAsyncToAnyInputReturn(new UserCreationResult());
 
 			await _userService.RegisterUserAsync("validUserName", "validUserEmail@example.com", "ValidPassword");
 		}
@@ -32,9 +31,7 @@ namespace BGSBTesting
 		public async Task RegisterUserAsyncReturnsRegistrationError()
 		{
 			var error = UserCreationResult.ErrorCode.InvalidEmail;
-			_iUserRepositoryMock
-				.Setup(iur => iur.CreateAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-				.ReturnsAsync(new UserCreationResult() { Errors = [error] });
+			SetupIUserRepositoryCreateAsyncToAnyInputReturn(new UserCreationResult() { Errors = [error] });
 
 			var result = await _userService.RegisterUserAsync("validUserName", "validUserEmail@example.com", "ValidPassword");
 
@@ -46,9 +43,7 @@ namespace BGSBTesting
 		{
 			var error1 = UserCreationResult.ErrorCode.InvalidEmail;
 			var error2 = UserCreationResult.ErrorCode.PasswordTooShort;
-			_iUserRepositoryMock
-				.Setup(iur => iur.CreateAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-				.ReturnsAsync(new UserCreationResult() { Errors = [error1, error2] });
+			SetupIUserRepositoryCreateAsyncToAnyInputReturn(new UserCreationResult() { Errors = [error1, error2] });
 
 			var result = await _userService.RegisterUserAsync("validUserName", "validUserEmail@example.com", "ValidPassword");
 
@@ -94,7 +89,7 @@ namespace BGSBTesting
 		[TestMethod]
 		public async Task SignInAsyncReturnsSignInResult()
 		{
-			SetupIUserRepositorySignInAsyncToReturnSucess(true);
+			SetupIUserRepositorySignInAsyncToAnyInputReturnSucess(true);
 
 			var signInResult = await _userService.SignInAsync("userName", "password");
 
@@ -104,7 +99,7 @@ namespace BGSBTesting
 		[TestMethod]
 		public async Task SignInAsyncReturnsSignInResultWithIsSuccesfulFlagTrueWhenSignInWasSuccesful()
 		{
-			SetupIUserRepositorySignInAsyncToReturnSucess(true);
+			SetupIUserRepositorySignInAsyncToAnyInputReturnSucess(true);
 
 			var signInResult = await _userService.SignInAsync("userName", "password");
 
@@ -114,18 +109,25 @@ namespace BGSBTesting
 		[TestMethod]
 		public async Task SignInAsyncReturnsSignInResultWithIsSuccesfulFlagFalseWhenSignInWasFail()
 		{
-			SetupIUserRepositorySignInAsyncToReturnSucess(false);
+			SetupIUserRepositorySignInAsyncToAnyInputReturnSucess(false);
 
 			var signInResult = await _userService.SignInAsync("userName", "password");
 
 			Assert.IsFalse(signInResult.IsSuccesful);
 		}
 
-		private void SetupIUserRepositorySignInAsyncToReturnSucess(bool sucess)
+		private void SetupIUserRepositorySignInAsyncToAnyInputReturnSucess(bool sucess)
 		{
 			_iUserRepositoryMock
 				.Setup(ur => ur.SignInAsync(It.IsAny<string>(), It.IsAny<string>()))
 				.ReturnsAsync(new SignInResult() { IsSuccesful = sucess });
+		}
+
+		private void SetupIUserRepositoryCreateAsyncToAnyInputReturn(UserCreationResult userCreationResult)
+		{
+			_iUserRepositoryMock
+				.Setup(iur => iur.CreateAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+				.ReturnsAsync(userCreationResult);
 		}
 	}
 }
