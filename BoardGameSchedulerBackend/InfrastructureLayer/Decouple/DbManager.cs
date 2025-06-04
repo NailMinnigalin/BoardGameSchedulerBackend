@@ -2,7 +2,7 @@
 using BoardGameSchedulerBackend.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
-namespace BoardGameSchedulerBackend.InfrastructureLayer
+namespace BoardGameSchedulerBackend.InfrastructureLayer.Decouple
 {
 	public class DbManager : IDbManager
 	{
@@ -21,6 +21,6 @@ namespace BoardGameSchedulerBackend.InfrastructureLayer
 		{
 			await _applicationDbContext.Database.EnsureDeletedAsync();
 			await _applicationDbContext.Database.MigrateAsync();
-		}	
+		}
 	}
 }

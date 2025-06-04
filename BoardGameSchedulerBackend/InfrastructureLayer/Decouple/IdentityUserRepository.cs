@@ -3,7 +3,7 @@ using BoardGameSchedulerBackend.BusinessLayer.Entity;
 using Microsoft.AspNetCore.Identity;
 using SignInResult = BoardGameSchedulerBackend.BusinessLayer.SignInResult;
 
-namespace BoardGameSchedulerBackend.Infrastructure
+namespace BoardGameSchedulerBackend.InfrastructureLayer.Decouple
 {
 	/// <summary>
 	/// Low-level user manager. Decouple business layer from Identity framework
