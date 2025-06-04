@@ -1,5 +1,5 @@
 ﻿using BoardGameSchedulerBackend.BusinessLayer;
-using BoardGameSchedulerBackend.DataLayer;
+using BoardGameSchedulerBackend.BusinessLayer.Entity;
 using Microsoft.AspNetCore.Identity;
 using SignInResult = BoardGameSchedulerBackend.BusinessLayer.SignInResult;
 

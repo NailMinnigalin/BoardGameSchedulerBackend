@@ -1,4 +1,4 @@
-﻿namespace BoardGameSchedulerBackend.DataLayer
+﻿namespace BoardGameSchedulerBackend.BusinessLayer.Entity
 {
 	public class User
 	{

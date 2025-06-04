@@ -1,5 +1,5 @@
 ﻿using BoardGameSchedulerBackend.BusinessLayer;
-using BoardGameSchedulerBackend.DataLayer;
+using BoardGameSchedulerBackend.BusinessLayer.Entity;
 using Microsoft.OpenApi.Validations;
 using Moq;
 using static System.Runtime.InteropServices.JavaScript.JSType;

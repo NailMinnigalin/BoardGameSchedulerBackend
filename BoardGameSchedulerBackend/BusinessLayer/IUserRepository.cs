@@ -1,4 +1,4 @@
-﻿using BoardGameSchedulerBackend.DataLayer;
+﻿using BoardGameSchedulerBackend.BusinessLayer.Entity;
 
 namespace BoardGameSchedulerBackend.BusinessLayer
 {

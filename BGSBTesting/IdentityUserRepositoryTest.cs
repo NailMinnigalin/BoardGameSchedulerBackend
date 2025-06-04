@@ -1,5 +1,5 @@
 ﻿using BoardGameSchedulerBackend.BusinessLayer;
-using BoardGameSchedulerBackend.DataLayer;
+using BoardGameSchedulerBackend.BusinessLayer.Entity;
 using BoardGameSchedulerBackend.Infrastructure;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
